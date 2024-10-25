@@ -1,92 +1,47 @@
 <!-- 
-    This is my Finance Dashboard, which I created for my Web Development class.
+    Updated Version with template from Joel
+    Original comment: This is my Finance Dashboard, which I created for my Web Development class.
     It is a simple dashboard, which allows you to add and delete income, expenses, debts and savings.
     It also calculates the final result.
     It also plays a sound if the final result is bigger than 0.
 -->
 <!DOCTYPE html>
-<!-- defines the document type and version of html-->
 <html lang="en">
-<!-- defines the language of the document-->
 <head>
-    <!--defines the character encoding of the document-->
     <meta charset="UTF-8">
-    <!--defines the viewport of the document-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--defines the link to the stylesheet-->
-    <link rel="stylesheet" href="styles.css" />
-    <!--defines the title of the document-->
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the CSS file -->
     <title>Personal Finance Dashboard</title>
-    <!--defines the link to the audio file-->
-    <audio id="cashSound" src="cash-register-sound.mp3"></audio>
-    <audio id="goodResult" src="goodresult.mp3"></audio>
-    <audio id="failSound" src="fail.mp3"></audio>
+    <audio id="cashSound" src="cash-register-sound.mp3"></audio> <!-- Cash sound -->
+    <audio id="goodResult" src="goodresult.mp3"></audio> <!-- Sound for good results -->
+    <audio id="failSound" src="fail.mp3"></audio> <!-- Sound for failed results -->
 </head>
 <body>
-    <!-- div element/Container with id=dashboard, for providing every element of my Dashboard--> 
-    <div id="dashboard">
-        <!-- div element/Container with class card, for providing every element of my income-card-->
-        <div class="card" id="income-card">
-            <!-- Header: Income-->    
-            <h3>Income</h3>
-            <!-- Paragraph: Description-->
-            <p>List all of your source and amount of income. Add or delete positions with the buttons.</p>
-            <!--Add-Button with onclick function, which adds a new row to my income-card-->
-            <button class="add-button" onclick="addRow('income-card')">add</button>
-            <!-- div element/Container with class row, for providing all of my inputs and delete-button-->
-            <div class="row">
-                <!-- Inputfield: Source-->
-                <input type="text" placeholder="source">
-                <!-- Inputfield: Amount-->
-                <input type="number" placeholder="amount" step="0.01" min="0">
-                <!-- Delete-Button with onclick function, which deletes the row, where the button is located-->
-                <button class="delete-button" onclick="deleteRow(this)">delete</button>
-            </div>  
-            <!-- Paragraph: Total-->    
-            <p id="income-total"></p>
-        </div>
+    <!-- Dashboard container -->
+    <div id="dashboard"></div>
 
-        <div class="card" id="expenses-card">
-            <h3>Expenses</h3>
-            <p>List all of your source and amount of expenses. Add or delete positions with the buttons.</p>
-            <button class="add-button" onclick="addRow('expenses-card')">add</button>
-            <div class="row">
+    <!-- Template for the card structure. It will be dynamically created with JavaScript for each category (Income, Expenses, etc.) -->
+    <template id="card-template">
+        <div class="card">
+            <h3></h3> <!-- Placeholder for card title (e.g., "Income") -->
+            <p class="description"></p> <!-- Placeholder for card description -->
+            <button class="add-button">Add</button> <!-- Add button -->
+            <div class="row"> <!-- Input fields for the rows within the card -->
                 <input type="text" placeholder="source">
                 <input type="number" placeholder="amount" step="0.01" min="0">
-                <button class="delete-button" onclick="deleteRow(this)">delete</button>
+                <button class="delete-button">Delete</button> <!-- Delete button -->
             </div>
-            <p id="expenses-total"></p>
+            <p class="total"></p> <!-- Placeholder for the total of the category -->
         </div>
+    </template>
 
-        <div class="card" id="debts-card">
-            <h3>Debts</h3>
-            <p>List all of your source and amount of debts. Add or delete positions with the buttons.</p>
-            <button class="add-button" onclick="addRow('debts-card')">add</button>
-            <div class="row">
-                <input type="text" placeholder="source">
-                <input type="number" placeholder="amount" step="0.01" min="0">
-                <button class="delete-button" onclick="deleteRow(this)">delete</button>
-            </div>
-            <p id="debts-total"></p>
-        </div>
+    <!-- Calculate button outside of the dashboard -->
+    <button id="calculate-button" onclick="calculate()">Calculate</button><!-- Button to trigger calculation -->
 
-        <div class="card" id="savings-card">
-            <h3>Savings</h3>
-            <p>List all of your source and amount of savings. Add or delete positions with the buttons.</p>
-            <button class="add-button" onclick="addRow('savings-card')">add</button>
-            <div class="row">
-                <input type="text" placeholder="source">
-                <input type="number" placeholder="amount" step="0.01" min="0">
-                <button class="delete-button" onclick="deleteRow(this)">delete</button>
-            </div>
-            <p id="savings-total"></p>
-        </div>
-        <!--Calculation-Button with onclick function, which calculates the final result -->
-        <div><button class="calc-button" onclick="calculate()">Calculation</button></div>
-        <!--Paragraph: Final Result-->
-        <p id="final-result"></p>
-    </div>
-    <!--Link to my script.js file-->    
+    <!-- Paragraph: Final Result -->
+    <p id="final-result"></p> <!-- Element to display the final result -->
+
+    <!-- Link to the JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
