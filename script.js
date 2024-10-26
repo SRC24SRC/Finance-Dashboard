@@ -1,102 +1,111 @@
-/*      This function adds a new row to the specified card.
-        It creates input fields for the source and amount, a delete button, and appends them to the card.
-        It also plays a sound if the card is an income or savings card.*/
-        function addRow(cardId) {
-            /* if i push the add button of income or savings card, the sound will play. Income-card or savings-card stands for the id of the card.*/
-            if (cardId === 'income-card' || cardId === 'savings-card') {
-                /* This function plays the sound of a cash register.*/
-                playCashSound();
-            }
-            /* This function gets the card with the specified id and creates a new row with input fields for the source and amount, a delete button.*/
-            const card = document.getElementById(cardId);
-            /* Creates a new row with the class row.*/
-            const row = document.createElement('div');
-            row.className = 'row';  //Adds the class row to the new row.
-            /* Creates a new input field for the source.*/
-            const input1 = document.createElement('input');
-            input1.type = 'text';  //Sets the type of the input field to text.
-            input1.placeholder = 'source';  //Sets the placeholder of the input field to source.
-            /* Creates a new input field for the amount.*/
-            const input2 = document.createElement('input');
-            input2.type = 'number';     //Sets the type of the input field to number.
-            input2.placeholder = 'amount';  //Sets the placeholder of the input field to amount.
-            input2.step = '0.01';       //Sets the step of the input field to 0.01.
-            input2.min = '0';           //Sets the minimum of the input field to 0.
-            /* Creates a new delete button.*/
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';   //Adds the class delete-button to the new delete button.
-            deleteButton.textContent = 'delete';        //Sets the text content of the delete button to delete. 
-            deleteButton.onclick = function() {         //Adds the onclick function to the delete button.
-                deleteRow(deleteButton);                //Calls the deleteRow function with the delete button as the argument.  
-            };
-            /* Appends the input fields and the delete button to the row.*/
-            row.appendChild(input1);
-            row.appendChild(input2);
-            row.appendChild(deleteButton);
-            /* Inserts the new row at the beginning of the card.*/
-            card.insertBefore(row, card.lastElementChild);
-        }
+// Define the categories for the cards. Each category has an ID, name, and description.
+const categories = [
+    { id: 'income-card', name: 'Income', description: 'List all of your sources of income' },
+    { id: 'expenses-card', name: 'Expenses', description: 'List all your expenses' },
+    { id: 'debts-card', name: 'Debts', description: 'List all your debts' },
+    { id: 'savings-card', name: 'Savings', description: 'List all your savings' }
+];
 
-        /* This function deletes the row, where the button is located.*/
-        function deleteRow(button) {
-            const row = button.parentElement;
-            row.remove();
-        }
+// Function to create cards dynamically based on the template
+function createCards() {
+    const dashboard = document.getElementById('dashboard'); // Container for all cards
+    const template = document.getElementById('card-template'); // Reference to the template
 
-        /* This function plays the sound of a cash register.*/
-        function playCashSound() {
-            const audio = document.getElementById('cashSound');
-            audio.currentTime = 0;  //Audio starts from the beginning
-            audio.play();
-        }
+    categories.forEach(category => {
+        const cardClone = template.content.cloneNode(true); // Create a copy of the template
+        const card = cardClone.querySelector('.card');
 
-        /* This function plays the sound of a good result.*/
-        function playgoodResultSound() {
-            const audio = document.getElementById('goodResult');
-            audio.currentTime = 0;      //Audio starts from the beginning
-            audio.play();
-        }
+        // Populate elements in the template with specific category data
+        // category.id is the id of the array
+        card.id = category.id;
+        //we select the h3 of the template; .textContent is what is inside h3. category.name refers to the name property in the category array
+        card.querySelector('h3').textContent = category.name; // Set the title (e.g., "Income")
+        //the same filling the template .description element with the description of the array
+        card.querySelector('.description').textContent = category.description; // Set the description
+        card.querySelector('.add-button').onclick = () => addRow(category.id); // Link the add button to the addRow function
+        card.querySelector('.total').id = `${category.id}-total`; // Set ID for total calculation
+//.appendChild adds the element at the end of the dashboard
+        dashboard.appendChild(card); // Add the completed card to the dashboard
+    });
+}
 
-        function playfailSound() {
-            const audio = document.getElementById('failSound');
-            audio.currentTime = 0;      //Audio starts from the beginning
-            audio.play();
-        }
+// Called when the page is loaded to create the cards
+document.addEventListener('DOMContentLoaded', createCards);
 
-        /* This function calculates the final result.*/
-        function calculate() {
-            /* This array contains the categories of the card.*/
-            const categories = ['income', 'expenses', 'debts', 'savings'];
-            /* This object contains the totals of the categories.*/
-            const totals = {};
-            /* This for loop calculates the total of the categories.*/
-            for (let i = 0; i < categories.length; i++) {
-                const category = categories[i];
-                const card = document.getElementById(`${category}-card`);   //This gets the card with the specified id.
-                const inputs = card.querySelectorAll('input[type="number"]');  //This gets all the input fields with the type number.
-                let total = 0;  //This initializes the total to 0.
-                /* This for loop calculates the total of the category.*/
-                for (let j = 0; j < inputs.length; j++) {
-                    const input = inputs[j];  //This gets the input field with the specified index. 
-                    let value;  
-                    if (parseFloat(input.value)) {
-                        value = parseFloat(input.value);
-                    } else {
-                        value = 0;
-                    }
-                    total += Math.round(value * 100) / 100; 
-                }
-                /* This for loop adds the total of the category to the totals object.*/
-                totals[category] = total;
-                document.getElementById(`${category}-total`).textContent = `total ${category}: ${total.toFixed(2)} €`;
-            }
-            const finalResult = totals.income + totals.savings - totals.debts - totals.expenses;
-            document.getElementById('final-result').textContent = `total: ${finalResult.toFixed(2)} €`;
-            
-            /* Plays a sound of winning or losing depending of the total result.*/
-            if (finalResult >= 0) {
-                playgoodResultSound();
-            } else {
-                playfailSound();
-            }
-        }
+// Function to create a new row in a specific card
+function addRow(cardId) {
+    if (cardId === 'income-card' || cardId === 'savings-card') {
+        playSound('cashSound'); // Play sound only for specific cards
+    }
+
+    const card = document.getElementById(cardId);
+    const row = createRow(); // Generate a new row
+    //Insert Before +row,... checken ob es am Ende oder am Anfang eingefügt wird
+    card.insertBefore(row, card.lastElementChild); // Insert the new row into the card
+}
+
+// Helper function to create a new row with input fields and a delete button
+function createRow() {
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    // Use generic functions to create input fields and buttons
+    const inputSource = createInput('text', 'source');
+    const inputAmount = createInput('number', 'amount', { step: '0.01', min: '0' });
+    const deleteButton = createButton('Delete', 'delete-button', () => row.remove());
+
+    row.appendChild(inputSource);
+    row.appendChild(inputAmount);
+    row.appendChild(deleteButton);
+
+    return row;
+}
+
+// Generic function to create an input field
+function createInput(type, placeholder, attributes = {}) {
+    const input = document.createElement('input');
+    input.type = type;
+    input.placeholder = placeholder;
+    Object.assign(input, attributes); // Add additional attributes (like step or min)
+    return input;
+}
+
+// Generic function to create a button
+function createButton(text, className, onClickHandler) {
+    const button = document.createElement('button');
+    button.className = className;
+    button.textContent = text;
+    button.onclick = onClickHandler;
+    return button;
+}
+
+// Generic function to play the corresponding sound
+function playSound(soundId) {
+    const audio = document.getElementById(soundId);
+    audio.currentTime = 0;
+    audio.play();
+}
+
+// Function to calculate the total result
+function calculate() {
+    const totals = categories.reduce((acc, category) => {
+        acc[category.name.toLowerCase()] = calculateTotal(category.id); // Calculate total for each category
+        return acc;
+    }, {});
+
+    const finalResult = totals.income + totals.savings - totals.expenses - totals.debts; // Calculate final result
+    document.getElementById('final-result').textContent = `Total: ${finalResult.toFixed(2)} €`; // Display the final result
+
+    // Play the appropriate sound based on the result
+    playSound(finalResult >= 0 ? 'goodResult' : 'failSound');
+}
+
+// Function to calculate the total within a card (e.g., sum all income entries)
+function calculateTotal(cardId) {
+    const card = document.getElementById(cardId);
+    const inputs = card.querySelectorAll('input[type="number"]'); // Get all number input fields
+    return Array.from(inputs).reduce((total, input) => {
+        const value = parseFloat(input.value) || 0; // Parse the value or default to 0
+        return total + Math.round(value * 100) / 100; // Round to two decimal places
+    }, 0);
+}
